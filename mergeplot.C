@@ -240,7 +240,78 @@ void subtractppfromHI(TGraphErrors *g1, double value, double valueErr)
     }
 }
 
-void mergeplot(bool iseta = 1, bool isbk = 1, bool isppsub = 1)
+void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraphErrors *g3, bool iseta, bool isdM)
+{
+    c1->cd();
+    if (isdM)
+        g1->GetYaxis()->SetTitle("#DeltaM (GeV)");
+    if (!isdM)
+        g1->GetYaxis()->SetTitle("#DeltaWidth (GeV)");
+    g1->SetLineColor(kBlack);
+    g1->SetMarkerColor(kBlack);
+    g1->SetMarkerStyle(20); // Full circle
+    g1->SetMarkerSize(1.2);
+    g1->SetLineWidth(2);
+    g1->GetYaxis()->SetRangeUser(-0.8, 0.8);
+
+    g1->GetXaxis()->SetLimits(0.5, 5.5);
+    g1->GetXaxis()->SetRangeUser(0.5, 5.5);
+    g1->GetXaxis()->SetNdivisions(5, 0, 0, kFALSE);
+    g1->GetXaxis()->SetLabelSize(0);
+
+    g1->GetXaxis()->ChangeLabel(5, 0, 0.03, 11, -1, -1, "     0-100%");
+    g1->GetXaxis()->ChangeLabel(1, 0, 0.03, 11, -1, -1, "      0-10%");
+    g1->GetXaxis()->ChangeLabel(2, 0, 0.03, 11, -1, -1, "     10-20%");
+    g1->GetXaxis()->ChangeLabel(3, 0, 0.03, 11, -1, -1, "     20-30%");
+    g1->GetXaxis()->ChangeLabel(4, 0, 0.03, 11, -1, -1, "    30-100%");
+    g1->GetXaxis()->SetLabelOffset(0.03);
+
+    g1->Draw("AP");
+
+    g2->SetLineColor(kRed);
+    g2->SetMarkerColor(kRed);
+    g2->SetLineStyle(1);    // Solid line
+    g2->SetMarkerStyle(21); // Full circle
+    g2->SetMarkerSize(1.2);
+    g2->SetLineWidth(3);
+    g2->Draw("P SAME");
+
+    g3->SetLineColor(kBlue);
+    g3->SetMarkerColor(kBlue);
+    g3->SetMarkerStyle(22); // Full circle
+    g3->SetMarkerSize(1.2);
+    g3->SetLineStyle(1); // Dashed line
+    g3->SetLineWidth(2);
+    g3->Draw("P SAME");
+
+    TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
+    legend->AddEntry(g1, "Template", "lp");
+    legend->AddEntry(g2, "Fit", "lp");
+    legend->AddEntry(g3, "RMS", "lp");
+    legend->SetBorderSize(0);
+    legend->SetTextSize(0.03);
+    legend->Draw();
+
+    CMS_lumi(c1, 13, 10);
+
+    if (iseta)
+    {
+        if (isdM)
+            c1->SaveAs("./plots/HI-pp/eta_dM.png");
+        if (!isdM)
+            c1->SaveAs("./plots/HI-pp/eta_dW.png");
+    }
+
+    if (!iseta)
+    {
+        if (isdM)
+            c1->SaveAs("./plots/HI-pp/raw_dM.png");
+        if (!isdM)
+            c1->SaveAs("./plots/HI-pp/raw_dW.png");
+    }
+}
+
+void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
 {
     // one is pp + HI Points, without subtracting.
     // one is HI Points, with pp subtracted.
@@ -256,50 +327,23 @@ void mergeplot(bool iseta = 1, bool isbk = 1, bool isppsub = 1)
     readplot(f_2, iseta, isbk);
 
     getppfit();
+    cout << "Now Changing Order of dM" << endl;
     changeorder(g_zh_HI_dM);
+    cout << "Now Changing Order of dW" << endl;
     changeorder(g_zh_HI_dW);
+
     changeorderfrank(g_frank_fit_dM, +1);
     changeorderfrank(g_frank_rms_dM, +1);
+    changeorderfrank(g_frank_fit_dW, +1);
+    changeorderfrank(g_frank_rms_dW, +1);
 
+    cout << "Now Doing HI - PP of dM" << endl;
     subtractppfromHI(g_zh_HI_dM, fit_dm, fit_dm_err);
+    cout << "Now Doing HI - PP of dW" << endl;
     subtractppfromHI(g_zh_HI_dW, fit_dw, fit_dw_err);
 
     TCanvas *c1 = new TCanvas("c1", "", 800, 800);
-    c1->cd();
-
-    g_zh_HI_dM->SetLineColor(kBlack);
-    g_zh_HI_dM->SetMarkerColor(kBlack);
-    g_zh_HI_dM->SetMarkerStyle(20); // Full circle
-    g_zh_HI_dM->SetMarkerSize(1.2);
-    g_zh_HI_dM->SetLineWidth(2);
-    g_zh_HI_dM->GetYaxis()->SetRangeUser(-0.8, 0.8);
-    g_zh_HI_dM->Draw("AP");
-
-    g_frank_fit_dM->SetLineColor(kRed);
-    g_frank_fit_dM->SetMarkerColor(kRed);
-    g_frank_fit_dM->SetLineStyle(1);    // Solid line
-    g_frank_fit_dM->SetMarkerStyle(21); // Full circle
-    g_frank_fit_dM->SetMarkerSize(1.2);
-    g_frank_fit_dM->SetLineWidth(3);
-    g_frank_fit_dM->Draw("P SAME");
-
-    g_frank_rms_dM->SetLineColor(kBlue);
-    g_frank_rms_dM->SetMarkerColor(kBlue);
-    g_frank_rms_dM->SetMarkerStyle(22); // Full circle
-    g_frank_rms_dM->SetMarkerSize(1.2);
-    g_frank_rms_dM->SetLineStyle(2);    // Dashed line
-    g_frank_rms_dM->SetLineWidth(2);
-    g_frank_rms_dM->Draw("P SAME");
-
-    TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
-    legend->AddEntry(g_zh_HI_dM, "Template", "lp");
-    legend->AddEntry(g_frank_fit_dM, "Fit", "lp");
-    legend->AddEntry(g_frank_rms_dM, "RMS", "lp");
-    legend->SetBorderSize(0);
-    legend->SetTextSize(0.03);
-    legend->Draw();
-
-    CMS_lumi(c1,13,10);
-
-    c1->SaveAs("test.png");
+    TCanvas *c2 = new TCanvas("c2", "", 800, 800);
+    drawsubtractionplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true);
+    drawsubtractionplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false);
 }
