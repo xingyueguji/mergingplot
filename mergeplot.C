@@ -4,27 +4,46 @@
 
 void readfrankplot(TFile *f1, bool iseta, bool isbk, bool isppsub)
 {
-    f1->cd();
-    TDirectoryFile *dir_rms;
-    TDirectoryFile *dir_fit;
+    if (isppsub)
+    {
+        f1->cd();
+        TDirectoryFile *dir_rms;
+        TDirectoryFile *dir_fit;
 
-    if (iseta)
-    {
-        dir_rms = (TDirectoryFile *)f1->GetDirectory("Barrel/Graphs/RMS");
-        dir_fit = (TDirectoryFile *)f1->GetDirectory("Barrel/Graphs/fit");
-        g_frank_rms_dM = (TGraphErrors *)dir_rms->Get("graph_mean_barrel_Zheng");
-        g_frank_rms_dW = (TGraphErrors *)dir_rms->Get("graph_width_barrel_Zheng");
-        g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_width_barrel_Zheng_fit");
-        g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("graph_width_barrel_Zheng_fit");
+        if (iseta)
+        {
+            dir_rms = (TDirectoryFile *)f1->GetDirectory("Barrel/Graphs/RMS");
+            dir_fit = (TDirectoryFile *)f1->GetDirectory("Barrel/Graphs/fit");
+            g_frank_rms_dM = (TGraphErrors *)dir_rms->Get("graph_mean_barrel_Zheng");
+            g_frank_rms_dW = (TGraphErrors *)dir_rms->Get("graph_width_barrel_Zheng");
+            g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_width_barrel_Zheng_fit");
+            g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("graph_width_barrel_Zheng_fit");
+        }
+        if (!iseta)
+        {
+            dir_rms = (TDirectoryFile *)f1->GetDirectory("WholeAcceptance/Graphs/RMS");
+            dir_fit = (TDirectoryFile *)f1->GetDirectory("WholeAcceptance/Graphs/fit");
+            g_frank_rms_dM = (TGraphErrors *)dir_rms->Get("graph_mean_WA_Zheng");
+            g_frank_rms_dW = (TGraphErrors *)dir_rms->Get("graph_width_WA_Zheng");
+            g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_width_WA_Zheng_fit");
+            g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("graph_width_WA_Zheng_fit");
+        }
     }
-    if (!iseta)
+    if (!isppsub)
     {
-        dir_rms = (TDirectoryFile *)f1->GetDirectory("WholeAcceptance/Graphs/RMS");
-        dir_fit = (TDirectoryFile *)f1->GetDirectory("WholeAcceptance/Graphs/fit");
-        g_frank_rms_dM = (TGraphErrors *)dir_rms->Get("graph_mean_WA_Zheng");
-        g_frank_rms_dW = (TGraphErrors *)dir_rms->Get("graph_width_WA_Zheng");
-        g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_width_WA_Zheng_fit");
-        g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("graph_width_WA_Zheng_fit");
+        f1->cd();
+        TDirectoryFile *dir_fit;
+        dir_fit = (TDirectoryFile *)f1->GetDirectory("GraphsValues");
+        g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("massValGraphNewCent");
+        g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("widthValGraphNewCent");
+
+        TDirectoryFile *dir_canvas;
+        dir_canvas = (TDirectoryFile *)f1->GetDirectory("Canvases");
+        c_frank_fit_dM = (TCanvas *)dir_canvas->Get("cMassValNewCent");
+        c_frank_fit_dW = (TCanvas *)dir_canvas->Get("cWidthValNewCent");
+
+        h_frank_fit_pp_dM = (TH1D *)c_frank_fit_dM->GetListOfPrimitives()->FindObject("HistMassValppNewCent_dummyHist");
+        h_frank_fit_pp_dW = (TH1D *)c_frank_fit_dW->GetListOfPrimitives()->FindObject("HistWidthValppNewCent_dummyHist");
     }
 }
 void readplot(TFile *f1, bool iseta, bool isbk)
@@ -240,7 +259,63 @@ void subtractppfromHI(TGraphErrors *g1, double value, double valueErr)
     }
 }
 
-void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraphErrors *g3, bool iseta, bool isdM)
+TGraphErrors* addpppoint(TGraphErrors *g1, double value, double valueErr)
+{
+    int n = g1->GetN();
+
+    if (n < 2)
+    {
+        std::cerr << "Graph must have at least two points to rearrange." << std::endl;
+        return nullptr;
+    }
+
+    // Temporary arrays for the rearranged points
+    double *x = new double[n + 1];
+    double *y = new double[n + 1];
+    double *ex = new double[n + 1];
+    double *ey = new double[n + 1];
+
+    // Extract current points and print them
+    std::cout << "Original Points:" << std::endl;
+    for (int i = 0; i < n; ++i)
+    {
+        g1->GetPoint(i, x[i], y[i]);
+        ex[i] = g1->GetErrorX(i);
+        ey[i] = g1->GetErrorY(i);
+        std::cout << "x[" << i << "] = " << x[i] << ", y[" << i << "] = " << y[i]
+                  << ", ex[" << i << "] = " << ex[i] << ", ey[" << i << "] = " << ey[i] << std::endl;
+    }
+
+    x[n] = n + 1;
+    ex[n] = 0;
+    y[n] = value;
+    ey[n] = valueErr;
+
+    g1 = new TGraphErrors(n + 1, x, y, ex, ey);
+
+    cout << "# of points is" << g1->GetN() << endl;
+
+    // Print updated points
+    std::cout << "\nUpdated Points:" << std::endl;
+    for (int i = 0; i < n + 1; ++i)
+    {
+        g1->GetPoint(i, x[i], y[i]);
+        ex[i] = g1->GetErrorX(i);
+        ey[i] = g1->GetErrorY(i);
+        std::cout << "x[" << i << "] = " << x[i] << ", y[" << i << "] = " << y[i]
+                  << ", ex[" << i << "] = " << ex[i] << ", ey[" << i << "] = " << ey[i] << std::endl;
+    }
+
+    // Clean up temporary arrays
+    delete[] x;
+    delete[] y;
+    delete[] ex;
+    delete[] ey;
+
+    return g1;
+}
+
+void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraphErrors *g3, bool iseta, bool isdM, bool isbk)
 {
     c1->cd();
     if (isdM)
@@ -292,6 +367,39 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
     legend->SetTextSize(0.03);
     legend->Draw();
 
+    TLatex latex;
+    latex.SetTextFont(42);
+    latex.SetTextSize(0.03);
+    latex.SetTextAlign(11); // Left alignment
+
+    // Add the text
+    if (iseta)
+    {
+        if (isbk)
+        {
+            latex.DrawLatex(1.0, 0.45, "|#eta| < 1");
+            // latex.DrawLatex(1.0, 0.35, "temp bk sub");
+        }
+        if (!isbk)
+        {
+            latex.DrawLatex(1.0, 0.45, "|#eta| < 1");
+            // latex.DrawLatex(1.0, 0.35, "temp no bk sub");
+        }
+    }
+    if (!iseta)
+    {
+        if (isbk)
+        {
+            latex.DrawLatex(1.0, 0.45, "|#eta| < 2.4");
+            // latex.DrawLatex(1.0, 0.35, "temp bk sub");
+        }
+        if (!isbk)
+        {
+            latex.DrawLatex(1.0, 0.45, "|#eta| < 2.4");
+            // latex.DrawLatex(1.0, 0.35, "temp no bk sub");
+        }
+    }
+
     CMS_lumi(c1, 13, 10);
 
     if (iseta)
@@ -311,39 +419,213 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
     }
 }
 
-void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
+void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphErrors *g2 = nullptr, TGraphErrors *g3 = nullptr, bool iseta = false, bool isdM = false, bool isbk = false)
+{
+    c1->cd();
+    if (isdM)
+        g1->GetYaxis()->SetTitle("#DeltaM (GeV)");
+    if (!isdM)
+        g1->GetYaxis()->SetTitle("#DeltaWidth (GeV)");
+    g1->SetLineColor(kBlack);
+    g1->SetMarkerColor(kBlack);
+    g1->SetMarkerStyle(20); // Full circle
+    g1->SetMarkerSize(1.2);
+    g1->SetLineWidth(2);
+    if (isdM)
+        g1->GetYaxis()->SetRangeUser(89.5, 92.5);
+    if (!isdM)
+        g1->GetYaxis()->SetRangeUser(0, 4);
+
+    g1->GetXaxis()->SetLimits(0.5, 6.5);
+    g1->GetXaxis()->SetRangeUser(0.5, 6.5);
+    g1->GetXaxis()->SetNdivisions(6, 0, 0, kFALSE);
+    g1->GetXaxis()->SetLabelSize(0);
+
+    g1->GetXaxis()->ChangeLabel(6, 0, 0.03, 11, -1, -1, "        pp");
+    g1->GetXaxis()->ChangeLabel(5, 0, 0.03, 11, -1, -1, "   0-100%");
+    g1->GetXaxis()->ChangeLabel(1, 0, 0.03, 11, -1, -1, "     0-10%");
+    g1->GetXaxis()->ChangeLabel(2, 0, 0.03, 11, -1, -1, "   10-20%");
+    g1->GetXaxis()->ChangeLabel(3, 0, 0.03, 11, -1, -1, "   20-30%");
+    g1->GetXaxis()->ChangeLabel(4, 0, 0.03, 11, -1, -1, "  30-100%");
+    g1->GetXaxis()->SetLabelOffset(0.03);
+
+    g1->Draw("AP");
+
+    g2->SetLineColor(kRed);
+    g2->SetMarkerColor(kRed);
+    g2->SetLineStyle(1);    // Solid line
+    g2->SetMarkerStyle(21); // Full circle
+    g2->SetMarkerSize(1.2);
+    g2->SetLineWidth(3);
+    g2->Draw("P SAME");
+
+    /*g3->SetLineColor(kBlue);
+    g3->SetMarkerColor(kBlue);
+    g3->SetMarkerStyle(22); // Full circle
+    g3->SetMarkerSize(1.2);
+    g3->SetLineStyle(1); // Dashed line
+    g3->SetLineWidth(2);
+    g3->Draw("P SAME");*/
+
+    TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
+    legend->AddEntry(g1, "Template", "lp");
+    legend->AddEntry(g2, "Fit", "lp");
+    // legend->AddEntry(g3, "RMS", "lp");
+    legend->SetBorderSize(0);
+    legend->SetTextSize(0.03);
+    legend->Draw();
+
+    TLatex latex;
+    latex.SetTextFont(42);
+    latex.SetTextSize(0.03);
+    latex.SetTextAlign(11); // Left alignment
+
+    // Add the text
+    if (iseta)
+    {
+        if (isbk)
+        {
+            if (isdM)
+                latex.DrawLatex(1.0, 91.7, "|#eta| < 1");
+            if (!isdM)
+                latex.DrawLatex(1.0, 3, "|#eta| < 1");
+            // latex.DrawLatex(1.0, 0.35, "temp bk sub");
+        }
+        if (!isbk)
+        {
+            if (isdM)
+                latex.DrawLatex(1.0, 91.7, "|#eta| < 1");
+            if (!isdM)
+                latex.DrawLatex(1.0, 3, "|#eta| < 1");
+            // latex.DrawLatex(1.0, 0.35, "temp no bk sub");
+        }
+    }
+    if (!iseta)
+    {
+        if (isbk)
+        {
+            if (isdM)
+                latex.DrawLatex(1.0, 91.7, "|#eta| < 2.4");
+            if (!isdM)
+                latex.DrawLatex(1.0, 3, "|#eta| < 2.4");
+            // latex.DrawLatex(1.0, 0.35, "temp bk sub");
+        }
+        if (!isbk)
+        {
+            if (isdM)
+                latex.DrawLatex(1.0, 91.7, "|#eta| < 2.4");
+            if (!isdM)
+                latex.DrawLatex(1.0, 3, "|#eta| < 2.4");
+            // latex.DrawLatex(1.0, 0.35, "temp no bk sub");
+        }
+    }
+
+    CMS_lumi(c1, 13, 10);
+
+    if (iseta)
+    {
+        if (isdM)
+            c1->SaveAs("./plots/HIandpp/eta_dM.png");
+        if (!isdM)
+            c1->SaveAs("./plots/HIandpp/eta_dW.png");
+    }
+
+    if (!iseta)
+    {
+        if (isdM)
+            c1->SaveAs("./plots/HIandpp/raw_dM.png");
+        if (!isdM)
+            c1->SaveAs("./plots/HIandpp/raw_dW.png");
+    }
+}
+
+void mergeplot(bool iseta = 1, bool isbk = 1, bool isppsub = 0)
 {
     // one is pp + HI Points, without subtracting.
     // one is HI Points, with pp subtracted.
     setTDRStyle();
 
-    // Frank's Place :)
-    TFile *f_1 = new TFile("DiffPlots_RMS_Fits.root", "READ");
-    readfrankplot(f_1, iseta, isbk, isppsub);
+    if (isppsub)
+    {
+        // Frank's Place :)
+        TFile *f_1 = new TFile("DiffPlots_RMS_Fits.root", "READ");
+        readfrankplot(f_1, iseta, isbk, isppsub);
 
-    // Zheng's Place :(
+        // Zheng's Place :(
 
-    TFile *f_2 = new TFile("../pp_18/All_plots.root", "READ");
-    readplot(f_2, iseta, isbk);
+        TFile *f_2 = new TFile("../pp_18/All_plots.root", "READ");
+        readplot(f_2, iseta, isbk);
 
-    getppfit();
-    cout << "Now Changing Order of dM" << endl;
-    changeorder(g_zh_HI_dM);
-    cout << "Now Changing Order of dW" << endl;
-    changeorder(g_zh_HI_dW);
+        getppfit();
+        cout << "Now Changing Order of dM" << endl;
+        changeorder(g_zh_HI_dM);
+        cout << "Now Changing Order of dW" << endl;
+        changeorder(g_zh_HI_dW);
 
-    changeorderfrank(g_frank_fit_dM, +1);
-    changeorderfrank(g_frank_rms_dM, +1);
-    changeorderfrank(g_frank_fit_dW, +1);
-    changeorderfrank(g_frank_rms_dW, +1);
+        changeorderfrank(g_frank_fit_dM, +1);
+        changeorderfrank(g_frank_rms_dM, +1);
+        changeorderfrank(g_frank_fit_dW, +1);
+        changeorderfrank(g_frank_rms_dW, +1);
 
-    cout << "Now Doing HI - PP of dM" << endl;
-    subtractppfromHI(g_zh_HI_dM, fit_dm, fit_dm_err);
-    cout << "Now Doing HI - PP of dW" << endl;
-    subtractppfromHI(g_zh_HI_dW, fit_dw, fit_dw_err);
+        cout << "Now Doing HI - PP of dM" << endl;
+        subtractppfromHI(g_zh_HI_dM, fit_dm, fit_dm_err);
+        cout << "Now Doing HI - PP of dW" << endl;
+        subtractppfromHI(g_zh_HI_dW, fit_dw, fit_dw_err);
 
-    TCanvas *c1 = new TCanvas("c1", "", 800, 800);
-    TCanvas *c2 = new TCanvas("c2", "", 800, 800);
-    drawsubtractionplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true);
-    drawsubtractionplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false);
+        TCanvas *c1 = new TCanvas("c1", "", 800, 800);
+        TCanvas *c2 = new TCanvas("c2", "", 800, 800);
+        drawsubtractionplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true, isbk);
+        drawsubtractionplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false, isbk);
+    }
+
+    if (!isppsub)
+    {
+        TFile *f_1;
+        // Frank's Place :)
+
+        if (iseta)
+        {
+            f_1 = new TFile("PbPbCentDiff_Barrelv2.root", "READ");
+        }
+        if (!iseta)
+        {
+            f_1 = new TFile("PbPbCentDiff_WAv2.root", "READ");
+        }
+
+        readfrankplot(f_1, iseta, isbk, isppsub);
+
+        // Zheng's Place :(
+
+        TFile *f_2 = new TFile("../pp_18/All_plots.root", "READ");
+        readplot(f_2, iseta, isbk);
+
+        changeorder(g_zh_HI_dM);
+        changeorder(g_zh_HI_dW);
+        subtractppfromHI(g_zh_HI_dM, -91.1876, 0);
+        subtractppfromHI(g_zh_HI_dW, -2.4955, 0);
+        subtractppfromHI(g_zh_pp_dM, -91.1876, 0);
+        subtractppfromHI(g_zh_pp_dW, -2.4955, 0);
+
+        getppfit();
+
+        changeorderfrank(g_frank_fit_dM, +1);
+        changeorderfrank(g_frank_fit_dW, +1);
+
+        double frank_fit_pp_dM = h_frank_fit_pp_dM->GetBinContent(1);
+        double frank_fit_pp_dM_err = h_frank_fit_pp_dM->GetBinError(1);
+        double frank_fit_pp_dW = h_frank_fit_pp_dW->GetBinContent(1);
+        double frank_fit_pp_dW_err = h_frank_fit_pp_dW->GetBinError(1);
+
+        g_frank_fit_dM = addpppoint(g_frank_fit_dM, frank_fit_pp_dM, frank_fit_pp_dM_err);
+        g_frank_fit_dW = addpppoint(g_frank_fit_dW, frank_fit_pp_dW, frank_fit_pp_dW_err);
+
+        g_zh_HI_dM = addpppoint(g_zh_HI_dM, fit_dm, fit_dm_err);
+        g_zh_HI_dW = addpppoint(g_zh_HI_dW, fit_dw, fit_dw_err);
+
+        TCanvas *c1 = new TCanvas("c1", "", 800, 800);
+        TCanvas *c2 = new TCanvas("c2", "", 800, 800);
+
+        drawHIppplot(c1, g_zh_HI_dM, g_frank_fit_dM, nullptr, iseta, true, isbk);
+        drawHIppplot(c2, g_zh_HI_dW, g_frank_fit_dW, nullptr, iseta, false, isbk);
+    }
 }

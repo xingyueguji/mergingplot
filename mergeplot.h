@@ -32,6 +32,12 @@ TGraphErrors *g_frank_rms_dW;
 TGraphErrors *g_frank_fit_dM;
 TGraphErrors *g_frank_fit_dW;
 
+TH1D *h_frank_fit_pp_dM;
+TH1D *h_frank_fit_pp_dW;
+
+TCanvas *c_frank_fit_dM;
+TCanvas *c_frank_fit_dW;
+
 
 double fit_dm;
 double fit_dm_err;

@@ -3,6 +3,7 @@
         "tdrStyle.C": "cpp",
         "CMS_lumi.C": "cpp",
         "mergeplot.C": "cpp",
-        "mergeplot copy.C": "cpp"
+        "mergeplot copy.C": "cpp",
+        "ostream": "cpp"
     }
 }
