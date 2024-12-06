@@ -4,6 +4,7 @@
         "CMS_lumi.C": "cpp",
         "mergeplot.C": "cpp",
         "mergeplot copy.C": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "__config": "cpp"
     }
 }
