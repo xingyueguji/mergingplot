@@ -390,7 +390,7 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
 
     g3->SetLineColor(kBlue);
     g3->SetMarkerColor(kBlue);
-    g3->SetMarkerStyle(22); // Full circle
+    g3->SetMarkerStyle(24); // Full circle
     g3->SetMarkerSize(1.2);
     g3->SetLineStyle(1); // Dashed line
     g3->SetLineWidth(2);
@@ -498,7 +498,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
 
     g3->SetLineColor(kBlue);
     g3->SetMarkerColor(kBlue);
-    g3->SetMarkerStyle(22); // Full circle
+    g3->SetMarkerStyle(24); // Full circle
     g3->SetMarkerSize(1.2);
     g3->SetLineStyle(1); // Dashed line
     g3->SetLineWidth(2);
@@ -576,7 +576,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
     }
 }
 
-void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
+void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
 {
     // one is pp + HI Points, without subtracting.
     // one is HI Points, with pp subtracted.
