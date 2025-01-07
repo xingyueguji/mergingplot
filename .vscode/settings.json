@@ -5,6 +5,7 @@
         "mergeplot.C": "cpp",
         "mergeplot copy.C": "cpp",
         "ostream": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "runall.C": "cpp"
     }
 }

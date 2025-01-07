@@ -358,7 +358,7 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
     if (isdM)
         g1->GetYaxis()->SetTitle("#DeltaM (GeV)");
     if (!isdM)
-        g1->GetYaxis()->SetTitle("#Delta#Gamma (GeV)");
+        g1->GetYaxis()->SetTitle("#DeltaWidth (GeV)");
     g1->SetLineColor(kBlack);
     g1->SetMarkerColor(kBlack);
     g1->SetMarkerStyle(20); // Full circle
@@ -380,6 +380,12 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
 
     g1->Draw("AP");
 
+    TLine *line = new TLine(0.5, 0, 5.5, 0);
+    line->SetLineColor(kBlack); // Set line color (optional)
+    line->SetLineWidth(2);      // Set line width (optional)
+    line->SetLineStyle(2);      // Set line style: 1=solid, 2=dashed, etc. (optional)
+    line->Draw("SAME");
+
     g2->SetLineColor(kRed);
     g2->SetMarkerColor(kRed);
     g2->SetLineStyle(1);    // Solid line
@@ -396,10 +402,20 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
     g3->SetLineWidth(2);
     g3->Draw("P SAME");
 
-    TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
-    legend->AddEntry(g1, "Template", "lp");
-    legend->AddEntry(g2, "Fit", "lp");
-    legend->AddEntry(g3, "RMS", "lp");
+    TLegend *legend = new TLegend(0.55, 0.7, 0.9, 0.9);
+    if (isdM)
+    {
+        legend->AddEntry(g1, "Template shift", "lp");
+        legend->AddEntry(g2, "Fit mean", "lp");
+        legend->AddEntry(g3, "Window Counting mean", "lp");
+    }
+    if (!isdM)
+    {
+        legend->AddEntry(g1, "Template smearing", "lp");
+        legend->AddEntry(g2, "Fit sigma", "lp");
+        legend->AddEntry(g3, "Window Counting RMS", "lp");
+    }
+
     legend->SetBorderSize(0);
     legend->SetTextSize(0.03);
     legend->Draw();
@@ -462,7 +478,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
     if (isdM)
         g1->GetYaxis()->SetTitle("M (GeV)");
     if (!isdM)
-        g1->GetYaxis()->SetTitle("#Gamma (GeV)");
+        g1->GetYaxis()->SetTitle("Width (GeV)");
     g1->SetLineColor(kBlack);
     g1->SetMarkerColor(kBlack);
     g1->SetMarkerStyle(20); // Full circle
@@ -504,10 +520,39 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
     g3->SetLineWidth(2);
     g3->Draw("P SAME");
 
-    TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
-    legend->AddEntry(g1, "Template", "lp");
-    legend->AddEntry(g2, "Fit", "lp");
-    legend->AddEntry(g3, "RMS", "lp");
+    g1->Draw("P SAME");
+
+    TLine *line_g1 = new TLine(0.5, g1->GetPointY(5), 6.5, g1->GetPointY(5));
+    line_g1->SetLineColor(kBlack); // Set line color (optional)
+    line_g1->SetLineWidth(2);      // Set line width (optional)
+    line_g1->SetLineStyle(2);      // Set line style: 1=solid, 2=dashed, etc. (optional)
+    line_g1->Draw("SAME");
+
+    TLine *line_g2 = new TLine(0.5, g2->GetPointY(5), 6.5, g2->GetPointY(5));
+    line_g2->SetLineColor(kRed); // Set line color (optional)
+    line_g2->SetLineWidth(2);    // Set line width (optional)
+    line_g2->SetLineStyle(2);    // Set line style: 1=solid, 2=dashed, etc. (optional)
+    line_g2->Draw("SAME");
+
+    TLine *line_g3 = new TLine(0.5, g3->GetPointY(5), 6.5, g3->GetPointY(5));
+    line_g3->SetLineColor(kBlue); // Set line color (optional)
+    line_g3->SetLineWidth(2);     // Set line width (optional)
+    line_g3->SetLineStyle(2);     // Set line style: 1=solid, 2=dashed, etc. (optional)
+    line_g3->Draw("SAME");
+
+    TLegend *legend = new TLegend(0.55, 0.7, 0.9, 0.9);
+    if (isdM)
+    {
+        legend->AddEntry(g1, "Template shift", "lp");
+        legend->AddEntry(g2, "Fit mean", "lp");
+        legend->AddEntry(g3, "Window Counting mean", "lp");
+    }
+    if (!isdM)
+    {
+        legend->AddEntry(g1, "Template smearing", "lp");
+        legend->AddEntry(g2, "Fit sigma", "lp");
+        legend->AddEntry(g3, "Window Counting RMS", "lp");
+    }
     legend->SetBorderSize(0);
     legend->SetTextSize(0.03);
     legend->Draw();
@@ -576,7 +621,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
     }
 }
 
-void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
+void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
 {
     // one is pp + HI Points, without subtracting.
     // one is HI Points, with pp subtracted.
@@ -604,14 +649,13 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
         changeorderfrank(g_frank_fit_dW, +1);
         changeorderfrank(g_frank_rms_dW, +1);
 
-        //To shift the points a little bit
-        changeorderfrank(g_zh_HI_dM,-0.1);
-        //changeorderfrank(g_frank_fit_dM)
-        changeorderfrank(g_frank_rms_dM,+0.1);
-        changeorderfrank(g_zh_HI_dW,-0.1);
-        //changeorderfrank(g_frank_fit_dM)
-        changeorderfrank(g_frank_rms_dW,+0.1);
-
+        // To shift the points a little bit
+        changeorderfrank(g_zh_HI_dM, -0.1);
+        // changeorderfrank(g_frank_fit_dM)
+        changeorderfrank(g_frank_rms_dM, +0.1);
+        changeorderfrank(g_zh_HI_dW, -0.1);
+        // changeorderfrank(g_frank_fit_dM)
+        changeorderfrank(g_frank_rms_dW, +0.1);
 
         cout << "Now Doing HI - PP of dM" << endl;
         subtractppfromHI(g_zh_HI_dM, fit_dm, fit_dm_err);
@@ -631,11 +675,11 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
 
         if (iseta)
         {
-            f_1 = new TFile("PbPbCentDiff_Barrelv2.root", "READ");
+            f_1 = new TFile("PbPbCentDiff_Barrel2v2.root", "READ");
         }
         if (!iseta)
         {
-            f_1 = new TFile("PbPbCentDiff_WAv2.root", "READ");
+            f_1 = new TFile("PbPbCentDiff_WA2v2.root", "READ");
         }
 
         TFile *f_3 = new TFile("ppPbPbCentMeanRMS_bkgd_subtracted.root", "READ");
@@ -667,13 +711,10 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 1)
         double frank_fit_pp_dW = h_frank_fit_pp_dW->GetBinContent(1);
         double frank_fit_pp_dW_err = h_frank_fit_pp_dW->GetBinError(1);
 
-        
-
         double frank_rms_pp_dM = h_frank_rms_pp_dM->GetBinContent(1);
         double frank_rms_pp_dM_err = h_frank_rms_pp_dM->GetBinError(1);
         double frank_rms_pp_dW = h_frank_rms_pp_dW->GetBinContent(1);
         double frank_rms_pp_dW_err = h_frank_rms_pp_dW->GetBinError(1);
-
 
         g_frank_fit_dM = addpppoint(g_frank_fit_dM, frank_fit_pp_dM, frank_fit_pp_dM_err);
         g_frank_fit_dW = addpppoint(g_frank_fit_dW, frank_fit_pp_dW, frank_fit_pp_dW_err);
