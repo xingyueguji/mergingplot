@@ -16,7 +16,7 @@ void readfrankplot(TFile *f1, bool iseta, bool isbk, bool isppsub, bool isorigin
             dir_fit = (TDirectoryFile *)f1->GetDirectory("Barrel/Graphs/fit");
             g_frank_rms_dM = (TGraphErrors *)dir_rms->Get("graph_mean_barrel_Zheng");
             g_frank_rms_dW = (TGraphErrors *)dir_rms->Get("graph_width_barrel_Zheng");
-            g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_width_barrel_Zheng_fit");
+            g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_mean_barrel_Zheng_fit");
             g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("graph_width_barrel_Zheng_fit");
         }
         if (!iseta)
@@ -25,7 +25,7 @@ void readfrankplot(TFile *f1, bool iseta, bool isbk, bool isppsub, bool isorigin
             dir_fit = (TDirectoryFile *)f1->GetDirectory("WholeAcceptance/Graphs/fit");
             g_frank_rms_dM = (TGraphErrors *)dir_rms->Get("graph_mean_WA_Zheng");
             g_frank_rms_dW = (TGraphErrors *)dir_rms->Get("graph_width_WA_Zheng");
-            g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_width_WA_Zheng_fit");
+            g_frank_fit_dM = (TGraphErrors *)dir_fit->Get("graph_mean_WA_Zheng_fit");
             g_frank_fit_dW = (TGraphErrors *)dir_fit->Get("graph_width_WA_Zheng_fit");
         }
     }
@@ -83,60 +83,131 @@ void readfrankplot(TFile *f1, bool iseta, bool isbk, bool isppsub, bool isorigin
         }
     }
 }
-void readplot(TFile *f1, bool iseta, bool isbk)
+void readplot(TFile *f1, bool iseta, bool isbk, bool iseff)
 {
-    // Naming:
-    // pp_dM_chi2_eta_bksub
-    // pp_dWidth_chi2_eta_bksub
-    // pp_dM_chi2_eta_nobksub
-    // pp_dWidth_chi2_eta_nobksub
-    // pp_dM_chi2_raw_bksub
-    // pp_dWidth_chi2_raw_bksub
-    // pp_dM_chi2_raw_nobksub
-    // pp_dWidth_chi2_raw_nobksub
+    // PP now is special, it is data without eff, with/without special PbPb background (without eff), with mc signal with eff correction
+    //  Naming:
+    /*
+    nothing:
+    HI_dM_chi2_raw
+    HI_dWidth_chi2_raw
+    HI_dM_chi2_eta
+    HI_dWidth_chi2_eta
 
-    // HI_dM_chi2_eta_bksub
-    // HI_dWidth_chi2_eta_bksub
-    // HI_dM_chi2_eta
-    // HI_dWidth_chi2_eta
-    // HI_dM_chi2_raw_bksub
-    // HI_dWidth_chi2_raw_bksub
-    // HI_dM_chi2_raw
-    // HI_dWidth_chi2_raw
+    bksub:
+    HI_dM_chi2_raw_bksub
+    HI_dWidth_chi2_raw_bksub
+    HI_dM_chi2_eta_bksub
+    HI_dWidth_chi2_eta_bksub
+
+    eff:
+    HI_dM_chi2_raw_eff
+    HI_dWidth_chi2_raw_eff
+    HI_dM_chi2_eta_eff
+    HI_dWidth_chi2_eta_eff
+
+    bk+eff:
+    HI_dM_chi2_raw_bksub_eff
+    HI_dWidth_chi2_raw_bksub_eff
+    HI_dM_chi2_eta_bksub_eff
+    HI_dWidth_chi2_eta_bksub_eff
+    */
+
+    // For pp:
+    /* bksub:
+    pp_dM_chi2_raw_bksub
+    pp_dWidth_chi2_raw_bksub
+    pp_dM_chi2_eta_bksub
+    pp_dWidth_chi2_eta_bksub
+
+    nobksub:
+    pp_dM_chi2_raw_nobksub
+    pp_dWidth_chi2_raw_nobksub
+    pp_dM_chi2_eta_nobksub
+    pp_dWidth_chi2_eta_nobksub
+    */
 
     f1->cd();
     if (iseta)
     {
         if (isbk)
         {
-            g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_eta_bksub");
-            g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_eta_bksub");
-            g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_eta_bksub");
-            g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_eta_bksub");
+            if (iseff)
+            {
+                // eta, bk, eff
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_eta_bksub_eff");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_eta_bksub_eff");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_eta_bksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_eta_bksub");
+            }
+            if (!iseff)
+            {
+                // eta, bk
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_eta_bksub");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_eta_bksub");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_eta_bksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_eta_bksub");
+            }
         }
         if (!isbk)
         {
-            g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_eta");
-            g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_eta");
-            g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_eta_nobksub");
-            g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_eta_nobksub");
+            if (iseff)
+            {
+                // eta, eff
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_eta_eff");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_eta_eff");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_eta_nobksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_eta_nobksub");
+            }
+            if (!iseff)
+            {
+                // eta
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_eta");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_eta");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_eta_nobksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_eta_nobksub");
+            }
         }
     }
     if (!iseta)
     {
         if (isbk)
         {
-            g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_raw_bksub");
-            g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_raw_bksub");
-            g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_raw_bksub");
-            g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_raw_bksub");
+            if (iseff)
+            {
+                // raw, bk, eff
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_raw_bksub_eff");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_raw_bksub_eff");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_raw_bksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_raw_bksub");
+            }
+            if (!iseff)
+            {
+                // raw, bk
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_raw_bksub");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_raw_bksub");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_raw_bksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_raw_bksub");
+            }
         }
         if (!isbk)
         {
-            g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_raw");
-            g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_raw");
-            g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_raw_nobksub");
-            g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_raw_nobksub");
+            if (iseff)
+            {
+                // raw,eff
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_raw_eff");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_raw_eff");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_raw_nobksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_raw_nobksub");
+            }
+            if (!iseff)
+            {
+                // raw
+                g_zh_HI_dM = (TGraphErrors *)f1->Get("HI_dM_chi2_raw");
+                g_zh_HI_dW = (TGraphErrors *)f1->Get("HI_dWidth_chi2_raw");
+                g_zh_pp_dM = (TGraphErrors *)f1->Get("pp_dM_chi2_raw_nobksub");
+                g_zh_pp_dW = (TGraphErrors *)f1->Get("pp_dWidth_chi2_raw_nobksub");
+            }
         }
     }
 }
@@ -352,8 +423,117 @@ TGraphErrors *addpppoint(TGraphErrors *g1, double value, double valueErr)
     return g1;
 }
 
-void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraphErrors *g3, bool iseta, bool isdM, bool isbk)
+void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraphErrors *g3, bool iseta, bool isdM, bool isbk, bool iseff)
 {
+
+    TString savingname;
+    if (iseta)
+    {
+        if (iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dM_eff_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dW_eff_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dM_eff.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dW_eff.png";
+                }
+            }
+        }
+        if (!iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dM_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dW_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dM.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/eta_dW.png";
+                }
+            }
+        }
+    }
+    if (!iseta)
+    {
+        if (iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dM_eff_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dW_eff_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dM_eff.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dW_eff.png";
+                }
+            }
+        }
+        if (!iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dM_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dW_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dM.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HI-pp/raw_dW.png";
+                }
+            }
+        }
+    }
+
     c1->cd();
     if (isdM)
         g1->GetYaxis()->SetTitle("#DeltaM (GeV)");
@@ -411,7 +591,7 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
     }
     if (!isdM)
     {
-        legend->AddEntry(g1, "Template smearing", "lp");
+        legend->AddEntry(g1, "Template shift", "lp");
         legend->AddEntry(g2, "Fit sigma", "lp");
         legend->AddEntry(g3, "Window Counting RMS", "lp");
     }
@@ -455,25 +635,119 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, TGraphErrors *g2, TGraph
 
     CMS_lumi(c1, 13, 10);
 
-    if (iseta)
-    {
-        if (isdM)
-            c1->SaveAs("./plots/HI-pp/eta_dM.png");
-        if (!isdM)
-            c1->SaveAs("./plots/HI-pp/eta_dW.png");
-    }
-
-    if (!iseta)
-    {
-        if (isdM)
-            c1->SaveAs("./plots/HI-pp/raw_dM.png");
-        if (!isdM)
-            c1->SaveAs("./plots/HI-pp/raw_dW.png");
-    }
+    c1->SaveAs(savingname);
 }
 
-void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphErrors *g2 = nullptr, TGraphErrors *g3 = nullptr, bool iseta = false, bool isdM = false, bool isbk = false)
+void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphErrors *g2 = nullptr, TGraphErrors *g3 = nullptr, bool iseta = false, bool isdM = false, bool isbk = false, bool iseff = false)
 {
+    TString savingname;
+    if (iseta)
+    {
+        if (iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dM_eff_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dW_eff_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dM_eff.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dW_eff.png";
+                }
+            }
+        }
+        if (!iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dM_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dW_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dM.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/eta_dW.png";
+                }
+            }
+        }
+    }
+    if (!iseta)
+    {
+        if (iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dM_eff_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dW_eff_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dM_eff.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dW_eff.png";
+                }
+            }
+        }
+        if (!iseff)
+        {
+            if (isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dM_bk.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dW_bk.png";
+                }
+            }
+            if (!isbk)
+            {
+                if (isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dM.png";
+                }
+                if (!isdM)
+                {
+                    savingname = "./plots/HIandpp/raw_dW.png";
+                }
+            }
+        }
+    }
+
     c1->cd();
     if (isdM)
         g1->GetYaxis()->SetTitle("M (GeV)");
@@ -549,7 +823,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
     }
     if (!isdM)
     {
-        legend->AddEntry(g1, "Template smearing", "lp");
+        legend->AddEntry(g1, "Template shift", "lp");
         legend->AddEntry(g2, "Fit sigma", "lp");
         legend->AddEntry(g3, "Window Counting RMS", "lp");
     }
@@ -604,24 +878,10 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, TGraphError
 
     CMS_lumi(c1, 13, 10);
 
-    if (iseta)
-    {
-        if (isdM)
-            c1->SaveAs("./plots/HIandpp/eta_dM.png");
-        if (!isdM)
-            c1->SaveAs("./plots/HIandpp/eta_dW.png");
-    }
-
-    if (!iseta)
-    {
-        if (isdM)
-            c1->SaveAs("./plots/HIandpp/raw_dM.png");
-        if (!isdM)
-            c1->SaveAs("./plots/HIandpp/raw_dW.png");
-    }
+    c1->SaveAs(savingname);
 }
 
-void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
+void mergeplot(bool iseta = 0, bool isbk = 1, bool iseff = 1,bool isppsub = 0)
 {
     // one is pp + HI Points, without subtracting.
     // one is HI Points, with pp subtracted.
@@ -636,7 +896,7 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
         // Zheng's Place :(
 
         TFile *f_2 = new TFile("All_plots.root", "READ");
-        readplot(f_2, iseta, isbk);
+        readplot(f_2, iseta, isbk, iseff);
 
         getppfit();
         cout << "Now Changing Order of dM" << endl;
@@ -664,8 +924,8 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
 
         TCanvas *c1 = new TCanvas("c1", "", 800, 800);
         TCanvas *c2 = new TCanvas("c2", "", 800, 800);
-        drawsubtractionplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true, isbk);
-        drawsubtractionplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false, isbk);
+        drawsubtractionplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true, isbk, iseff);
+        drawsubtractionplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false, isbk, iseff);
     }
 
     if (!isppsub)
@@ -675,11 +935,11 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
 
         if (iseta)
         {
-            f_1 = new TFile("PbPbCentDiff_Barrel2v2.root", "READ");
+            f_1 = new TFile("PbPbCentDiff_Barrel3v3.root", "READ");
         }
         if (!iseta)
         {
-            f_1 = new TFile("PbPbCentDiff_WA2v2.root", "READ");
+            f_1 = new TFile("PbPbCentDiff_WA3v3.root", "READ");
         }
 
         TFile *f_3 = new TFile("ppPbPbCentMeanRMS_bkgd_subtracted.root", "READ");
@@ -690,7 +950,7 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
         // Zheng's Place :(
 
         TFile *f_2 = new TFile("All_plots.root", "READ");
-        readplot(f_2, iseta, isbk);
+        readplot(f_2, iseta, isbk, iseff);
 
         changeorder(g_zh_HI_dM);
         changeorder(g_zh_HI_dW);
@@ -727,7 +987,7 @@ void mergeplot(bool iseta = 0, bool isbk = 1, bool isppsub = 0)
         TCanvas *c1 = new TCanvas("c1", "", 800, 800);
         TCanvas *c2 = new TCanvas("c2", "", 800, 800);
 
-        drawHIppplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true, isbk);
-        drawHIppplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false, isbk);
+        drawHIppplot(c1, g_zh_HI_dM, g_frank_fit_dM, g_frank_rms_dM, iseta, true, isbk, iseff);
+        drawHIppplot(c2, g_zh_HI_dW, g_frank_fit_dW, g_frank_rms_dW, iseta, false, isbk, iseff);
     }
 }
