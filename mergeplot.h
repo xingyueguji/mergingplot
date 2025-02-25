@@ -26,6 +26,10 @@ TGraphErrors *g_zh_HI_dM_nominal_uniform_rebin;
 TGraphErrors *g_zh_HI_dW_nominal_uniform_rebin;
 TGraphErrors *g_zh_HI_dM_nominal_mass_range;
 TGraphErrors *g_zh_HI_dW_nominal_mass_range;
+TGraphErrors *g_zh_HI_dM_HF_up;
+TGraphErrors *g_zh_HI_dW_HF_up;
+TGraphErrors *g_zh_HI_dM_HF_down;
+TGraphErrors *g_zh_HI_dW_HF_down;
 
 TGraphErrors *g_zh_HI_dM_nominal_minuspp;
 TGraphErrors *g_zh_HI_dW_nominal_minuspp;
@@ -41,10 +45,12 @@ TGraphErrors *g_zh_HI_dM_nominal_uniform_rebin_minuspp;
 TGraphErrors *g_zh_HI_dW_nominal_uniform_rebin_minuspp;
 TGraphErrors *g_zh_HI_dM_nominal_mass_range_minuspp;
 TGraphErrors *g_zh_HI_dW_nominal_mass_range_minuspp;
+TGraphErrors *g_zh_HI_dM_HF_down_minuspp;
+TGraphErrors *g_zh_HI_dW_HF_down_minuspp;
+TGraphErrors *g_zh_HI_dM_HF_up_minuspp;
+TGraphErrors *g_zh_HI_dW_HF_up_minuspp;
 
-TGraphErrors *g_frank_rms_dM;
-TGraphErrors *g_frank_rms_dW;
-
+// Frank's fit
 
 TGraphErrors *g_frank_fit_dM_nominal;
 TGraphErrors *g_frank_fit_dM_changesig;
@@ -76,5 +82,29 @@ TH1D *h_frank_fit_pp_dW_changesig;
 TH1D *h_frank_fit_pp_dW_linearbackground;
 TH1D *h_frank_fit_pp_dW_CB;
 
-TH1D *h_frank_rms_pp_dM;
-TH1D *h_frank_rms_pp_dW;
+// Frank's RMS
+
+TGraphErrors *g_frank_rms_dM_nominal;
+TGraphErrors *g_frank_rms_dW_nominal;
+
+TGraphErrors *g_frank_rms_dM_nominal_minuspp;
+TGraphErrors *g_frank_rms_dW_nominal_minuspp;
+
+TH1D *g_frank_rms_pp_dM_nominal;
+TH1D *g_frank_rms_pp_dW_nominal;
+
+TGraphErrors *g_frank_rms_pesudo_dM_3gamma;
+TGraphErrors *g_frank_rms_pesudo_dM_4gamma;
+TGraphErrors *g_frank_rms_pesudo_dM_5gamma;
+
+TGraphErrors *g_frank_rms_pesudo_dM_3gamma_minuspp;
+TGraphErrors *g_frank_rms_pesudo_dM_4gamma_minuspp;
+TGraphErrors *g_frank_rms_pesudo_dM_5gamma_minuspp;
+
+TGraphErrors *g_frank_rms_pesudo_dW_3gamma;
+TGraphErrors *g_frank_rms_pesudo_dW_4gamma;
+TGraphErrors *g_frank_rms_pesudo_dW_5gamma;
+
+TGraphErrors *g_frank_rms_pesudo_dW_3gamma_minuspp;
+TGraphErrors *g_frank_rms_pesudo_dW_4gamma_minuspp;
+TGraphErrors *g_frank_rms_pesudo_dW_5gamma_minuspp;

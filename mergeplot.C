@@ -46,6 +46,56 @@ void readfrankplot(TFile *f1, int type)
         h_frank_fit_pp_dW_CB = (TH1D *)c_frank_fit_dW->GetListOfPrimitives()->FindObject("HistWidthValppNewCent_dummyHist");
     }
 }
+void readfrankplotrms(TFile *f1, TFile *f2, bool iseta)
+{
+    TDirectoryFile *dir_graph;
+    TDirectoryFile *dir_canvas;
+
+    TDirectoryFile *dir_systematic_Mass;
+    TDirectoryFile *dir_systematic_RMS;
+
+    TCanvas *c_frank_rms_dM;
+    TCanvas *c_frank_rms_dW;
+
+    if (!iseta)
+    {
+        dir_graph = (TDirectoryFile *)f1->GetDirectory("GraphsValues/WholeAcceptance");
+        dir_canvas = (TDirectoryFile *)f1->GetDirectory("Canvases/Values/WholeAcceptance");
+        g_frank_rms_dM_nominal = (TGraphErrors *)dir_graph->Get("massValGraph_WA");
+        g_frank_rms_dW_nominal = (TGraphErrors *)dir_graph->Get("widthValGraph_WA");
+
+        c_frank_rms_dM = (TCanvas *)dir_canvas->Get("cMassVal_WA_NewCent");
+        c_frank_rms_dW = (TCanvas *)dir_canvas->Get("cWidthVal_WA_NewCent");
+
+        g_frank_rms_pp_dM_nominal = (TH1D *)c_frank_rms_dM->GetListOfPrimitives()->FindObject("HistMassValpp_WA_NewCent_dummyHist");
+        g_frank_rms_pp_dW_nominal = (TH1D *)c_frank_rms_dW->GetListOfPrimitives()->FindObject("HistWidthValpp_WA_NewCent_dummyHist");
+
+        dir_systematic_Mass = (TDirectoryFile *)f2->GetDirectory("Graphs/Vals/Mass");
+        dir_systematic_RMS = (TDirectoryFile *)f2->GetDirectory("Graphs/Vals/RMS");
+
+        g_frank_rms_pesudo_dM_3gamma = (TGraphErrors *)dir_systematic_Mass->Get("Graph;1");
+        g_frank_rms_pesudo_dM_4gamma = (TGraphErrors *)dir_systematic_Mass->Get("Graph;2");
+        g_frank_rms_pesudo_dM_5gamma = (TGraphErrors *)dir_systematic_Mass->Get("Graph;3");
+
+        g_frank_rms_pesudo_dW_3gamma = (TGraphErrors *)dir_systematic_RMS->Get("Graph;1");
+        g_frank_rms_pesudo_dW_4gamma = (TGraphErrors *)dir_systematic_RMS->Get("Graph;2");
+        g_frank_rms_pesudo_dW_5gamma = (TGraphErrors *)dir_systematic_RMS->Get("Graph;3");
+    }
+
+    if (iseta)
+    {
+        dir_graph = (TDirectoryFile *)f1->GetDirectory("GraphsValues/Barrel");
+        dir_canvas = (TDirectoryFile *)f1->GetDirectory("Canvases/Values/Barrel");
+        g_frank_rms_dM_nominal = (TGraphErrors *)dir_graph->Get("massValGraph_barrel");
+        g_frank_rms_dW_nominal = (TGraphErrors *)dir_graph->Get("widthValGraph_barrel");
+
+        c_frank_rms_dM = (TCanvas *)dir_canvas->Get("cMassVal_barrel_NewCent");
+        c_frank_rms_dW = (TCanvas *)dir_canvas->Get("cWidthVal_barrel_NewCent");
+
+        g_frank_rms_pp_dM_nominal = (TH1D *)c_frank_rms_dM->GetListOfPrimitives()->FindObject("HistMassValpp_barrel_NewCent_dummyHist");
+        g_frank_rms_pp_dW_nominal = (TH1D *)c_frank_rms_dW->GetListOfPrimitives()->FindObject("HistWidthValpp_barrel_NewCent_dummyHist");
+    }
+}
 void readplot(TFile *f1, bool iseta)
 {
     f1->cd();
@@ -66,6 +116,10 @@ void readplot(TFile *f1, bool iseta)
         g_zh_HI_dW_nominal_uniform_rebin = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_eta_nominal_uniform_rebin");
         g_zh_HI_dM_nominal_mass_range = (TGraphErrors *)f1->Get("HI_pp_dM_chi2_eta_nominal_mass_range");
         g_zh_HI_dW_nominal_mass_range = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_eta_nominal_mass_range");
+        g_zh_HI_dM_HF_up = (TGraphErrors *)f1->Get("HI_pp_dM_chi2_eta_HF_up");
+        g_zh_HI_dW_HF_up = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_eta_HF_up");
+        g_zh_HI_dM_HF_down = (TGraphErrors *)f1->Get("HI_pp_dM_chi2_eta_HF_down");
+        g_zh_HI_dW_HF_down = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_eta_HF_down");
 
         g_zh_HI_dM_nominal_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_eta_nominal");
         g_zh_HI_dW_nominal_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_eta_nominal");
@@ -81,6 +135,10 @@ void readplot(TFile *f1, bool iseta)
         g_zh_HI_dW_nominal_uniform_rebin_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_eta_nominal_uniform_rebin");
         g_zh_HI_dM_nominal_mass_range_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_eta_nominal_mass_range");
         g_zh_HI_dW_nominal_mass_range_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_eta_nominal_mass_range");
+        g_zh_HI_dM_HF_up_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_eta_HF_up");
+        g_zh_HI_dW_HF_up_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_eta_HF_up");
+        g_zh_HI_dM_HF_down_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_eta_HF_down");
+        g_zh_HI_dW_HF_down_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_eta_HF_down");
     }
     else
     {
@@ -99,6 +157,10 @@ void readplot(TFile *f1, bool iseta)
         g_zh_HI_dW_nominal_uniform_rebin = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_raw_nominal_uniform_rebin");
         g_zh_HI_dM_nominal_mass_range = (TGraphErrors *)f1->Get("HI_pp_dM_chi2_raw_nominal_mass_range");
         g_zh_HI_dW_nominal_mass_range = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_raw_nominal_mass_range");
+        g_zh_HI_dM_HF_up = (TGraphErrors *)f1->Get("HI_pp_dM_chi2_raw_HF_up");
+        g_zh_HI_dW_HF_up = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_raw_HF_up");
+        g_zh_HI_dM_HF_down = (TGraphErrors *)f1->Get("HI_pp_dM_chi2_raw_HF_down");
+        g_zh_HI_dW_HF_down = (TGraphErrors *)f1->Get("HI_pp_dWidth_chi2_raw_HF_down");
 
         g_zh_HI_dM_nominal_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_raw_nominal");
         g_zh_HI_dW_nominal_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_raw_nominal");
@@ -114,6 +176,10 @@ void readplot(TFile *f1, bool iseta)
         g_zh_HI_dW_nominal_uniform_rebin_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_raw_nominal_uniform_rebin");
         g_zh_HI_dM_nominal_mass_range_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_raw_nominal_mass_range");
         g_zh_HI_dW_nominal_mass_range_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_raw_nominal_mass_range");
+        g_zh_HI_dM_HF_up_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_raw_HF_up");
+        g_zh_HI_dW_HF_up_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_raw_HF_up");
+        g_zh_HI_dM_HF_down_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dM_chi2_raw_HF_down");
+        g_zh_HI_dW_HF_down_minuspp = (TGraphErrors *)f1->Get("HI_sub_pp_dWidth_chi2_raw_HF_down");
     }
 }
 
@@ -240,15 +306,15 @@ void changeorderfrank(TGraphErrors *g1, double shift)
     // Temporary variables to hold current points
     double x, y, ex, ey;
 
-    std::cout << "Before Shift:" << std::endl;
+    // std::cout << "Before Shift:" << std::endl;
     for (int i = 0; i < n; ++i)
     {
         g1->GetPoint(i, x, y); // Get current x and y
         ex = g1->GetErrorX(i); // Get x error
         ey = g1->GetErrorY(i); // Get y error
 
-        std::cout << "Point " << i << ": x = " << x << ", y = " << y
-                  << ", ex = " << ex << ", ey = " << ey << std::endl;
+        /*std::cout << "Point " << i << ": x = " << x << ", y = " << y
+                  << ", ex = " << ex << ", ey = " << ey << std::endl;*/
 
         // Shift the x value
         x += shift;
@@ -258,20 +324,26 @@ void changeorderfrank(TGraphErrors *g1, double shift)
         g1->SetPointError(i, ex, ey); // Errors remain unchanged
     }
 
-    std::cout << "\nAfter Shift:" << std::endl;
+    // std::cout << "\nAfter Shift:" << std::endl;
     for (int i = 0; i < n; ++i)
     {
         g1->GetPoint(i, x, y); // Get updated x and y
         ex = g1->GetErrorX(i); // Get x error
         ey = g1->GetErrorY(i); // Get y error
 
-        std::cout << "Point " << i << ": x = " << x << ", y = " << y
-                  << ", ex = " << ex << ", ey = " << ey << std::endl;
+        /*std::cout << "Point " << i << ": x = " << x << ", y = " << y
+                  << ", ex = " << ex << ", ey = " << ey << std::endl;*/
     }
 }
 
 TGraphErrors *subtractppfromHI(TGraphErrors *g1)
 {
+
+    if (g1 == nullptr)
+    {
+        return nullptr;
+    }
+
     int n = g1->GetN(); // Number of points in the graph
     if (n < 2)
     {
@@ -360,14 +432,14 @@ TGraphErrors *addpppoint(TGraphErrors *g1, double value, double valueErr)
     double *ey = new double[n + 1];
 
     // Extract current points and print them
-    std::cout << "Original Points:" << std::endl;
+    // std::cout << "Original Points:" << std::endl;
     for (int i = 0; i < n; ++i)
     {
         g1->GetPoint(i, x[i], y[i]);
         ex[i] = g1->GetErrorX(i);
         ey[i] = g1->GetErrorY(i);
-        std::cout << "x[" << i << "] = " << x[i] << ", y[" << i << "] = " << y[i]
-                  << ", ex[" << i << "] = " << ex[i] << ", ey[" << i << "] = " << ey[i] << std::endl;
+        /*std::cout << "x[" << i << "] = " << x[i] << ", y[" << i << "] = " << y[i]
+                  << ", ex[" << i << "] = " << ex[i] << ", ey[" << i << "] = " << ey[i] << std::endl;*/
     }
 
     x[n] = n + 1;
@@ -377,17 +449,17 @@ TGraphErrors *addpppoint(TGraphErrors *g1, double value, double valueErr)
 
     TGraphErrors *g2 = new TGraphErrors(n + 1, x, y, ex, ey);
 
-    cout << "# of points is" << g2->GetN() << endl;
+    // cout << "# of points is" << g2->GetN() << endl;
 
     // Print updated points
-    std::cout << "\nUpdated Points:" << std::endl;
+    // std::cout << "\nUpdated Points:" << std::endl;
     for (int i = 0; i < n + 1; ++i)
     {
         g2->GetPoint(i, x[i], y[i]);
         ex[i] = g2->GetErrorX(i);
         ey[i] = g2->GetErrorY(i);
-        std::cout << "x[" << i << "] = " << x[i] << ", y[" << i << "] = " << y[i]
-                  << ", ex[" << i << "] = " << ex[i] << ", ey[" << i << "] = " << ey[i] << std::endl;
+        /*std::cout << "x[" << i << "] = " << x[i] << ", y[" << i << "] = " << y[i]
+                  << ", ex[" << i << "] = " << ex[i] << ", ey[" << i << "] = " << ey[i] << std::endl;*/
     }
 
     // Clean up temporary arrays
@@ -399,7 +471,7 @@ TGraphErrors *addpppoint(TGraphErrors *g1, double value, double valueErr)
     return g2;
 }
 
-void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, std::vector<double> &g1_syst, TGraphErrors *g2 = nullptr, const std::vector<double> &g2_syst = std::vector<double>{}, TGraphErrors *g3 = nullptr, bool iseta = 0, bool isdM = 0)
+void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, std::vector<double> &g1_syst, TGraphErrors *g2 = nullptr, const std::vector<double> &g2_syst = std::vector<double>{}, TGraphErrors *g3 = nullptr, const std::vector<double> &g3_syst = std::vector<double>{}, bool iseta = 0, bool isdM = 0)
 {
 
     TString savingname;
@@ -423,6 +495,7 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, std::vector<double> &g1_
         g1->GetYaxis()->SetTitle("#DeltaM (GeV)");
     if (!isdM)
         g1->GetYaxis()->SetTitle("#DeltaWidth (GeV)");
+    g1->GetXaxis()->SetTitle("Centrality");
     g1->SetLineColor(kBlack);
     g1->SetMarkerColor(kBlack);
     g1->SetMarkerStyle(20); // Full circle
@@ -489,7 +562,7 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, std::vector<double> &g1_
     int n2 = g2->GetN();
     std::vector<TBox *> systBoxes2;
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n2; i++)
     {
         double x, y;
         g2->GetPoint(i, x, y);
@@ -513,26 +586,57 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, std::vector<double> &g1_
         systBoxes2.push_back(box);
     }
 
-    /*g3->SetLineColor(kBlue);
+    g3->SetLineColor(kBlue);
     g3->SetMarkerColor(kBlue);
     g3->SetMarkerStyle(24); // Full circle
     g3->SetMarkerSize(1.2);
     g3->SetLineStyle(1); // Dashed line
     g3->SetLineWidth(2);
-    g3->Draw("P SAME");*/
+    g3->Draw("P SAME");
 
-    TLegend *legend = new TLegend(0.55, 0.7, 0.9, 0.9);
+    int n3 = g3->GetN();
+    std::vector<TBox *> systBoxes3;
+
+    for (int i = 0; i < n3; i++)
+    {
+        if (g3_syst.size() == 0)
+        {
+            break;
+        }
+        double x, y;
+        g3->GetPoint(i, x, y);
+        double systError = g3_syst[i]; // Systematic error
+
+        // Define box boundaries (small width in X to appear as floating)
+        double xMin = x - 0.05; // Slight offset in X to make it visible
+        double xMax = x + 0.05;
+        double yMin = y - systError;
+        double yMax = y + systError;
+
+        // Create and style the box
+        TBox *box = new TBox(xMin, yMin, xMax, yMax);
+        box->SetFillStyle(0);     // Hollow box (no fill)
+        box->SetLineColor(kBlue); // Red border
+        box->SetLineWidth(2);     // Border thickness
+        box->SetLineStyle(2);     // Dashed line style
+        box->Draw("same");
+
+        // Store box in vector for memory management
+        systBoxes3.push_back(box);
+    }
+
+    TLegend *legend = new TLegend(0.55, 0.75, 0.95, 0.9);
     if (isdM)
     {
         legend->AddEntry(g1, "Template shift", "lp");
         legend->AddEntry(g2, "Fit mean", "lp");
-        // legend->AddEntry(g3, "Window Counting mean", "lp");
+        legend->AddEntry(g3, "Window Counting mean", "lp");
     }
     if (!isdM)
     {
         legend->AddEntry(g1, "Template shift", "lp");
         legend->AddEntry(g2, "Fit sigma", "lp");
-        // legend->AddEntry(g3, "Window Counting RMS", "lp");
+        legend->AddEntry(g3, "Window Counting RMS", "lp");
     }
 
     legend->SetBorderSize(0);
@@ -561,7 +665,7 @@ void drawsubtractionplot(TCanvas *c1, TGraphErrors *g1, std::vector<double> &g1_
     c1->SaveAs(savingname);
 }
 
-void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::vector<double> &g1_syst = std::vector<double>{}, TGraphErrors *g2 = nullptr, const std::vector<double> &g2_syst = std::vector<double>{}, TGraphErrors *g3 = nullptr, bool iseta = false, bool isdM = false)
+void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::vector<double> &g1_syst = std::vector<double>{}, TGraphErrors *g2 = nullptr, const std::vector<double> &g2_syst = std::vector<double>{}, TGraphErrors *g3 = nullptr, const std::vector<double> &g3_syst = std::vector<double>{}, bool iseta = false, bool isdM = false)
 {
     TString savingname;
 
@@ -585,6 +689,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::
         g1->GetYaxis()->SetTitle("M (GeV)");
     if (!isdM)
         g1->GetYaxis()->SetTitle("Width (GeV)");
+    g1->GetXaxis()->SetTitle("Centrality");
     g1->SetLineColor(kBlack);
     g1->SetMarkerColor(kBlack);
     g1->SetMarkerStyle(20); // Full circle
@@ -649,7 +754,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::
     int n2 = g2->GetN();
     std::vector<TBox *> systBoxes2;
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n2; i++)
     {
         double x, y;
         g2->GetPoint(i, x, y);
@@ -673,13 +778,44 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::
         systBoxes2.push_back(box);
     }
 
-    /*g3->SetLineColor(kBlue);
+    g3->SetLineColor(kBlue);
     g3->SetMarkerColor(kBlue);
     g3->SetMarkerStyle(24); // Full circle
     g3->SetMarkerSize(1.2);
     g3->SetLineStyle(1); // Dashed line
     g3->SetLineWidth(2);
-    g3->Draw("P SAME");*/
+    g3->Draw("P SAME");
+
+    int n3 = g3->GetN();
+    std::vector<TBox *> systBoxes3;
+
+    for (int i = 0; i < n3; i++)
+    {
+        if (g3_syst.size() == 0)
+        {
+            break;
+        }
+        double x, y;
+        g3->GetPoint(i, x, y);
+        double systError = g3_syst[i]; // Systematic error
+
+        // Define box boundaries (small width in X to appear as floating)
+        double xMin = x - 0.05; // Slight offset in X to make it visible
+        double xMax = x + 0.05;
+        double yMin = y - systError;
+        double yMax = y + systError;
+
+        // Create and style the box
+        TBox *box = new TBox(xMin, yMin, xMax, yMax);
+        box->SetFillStyle(0);     // Hollow box (no fill)
+        box->SetLineColor(kBlue); // Red border
+        box->SetLineWidth(2);     // Border thickness
+        box->SetLineStyle(2);     // Dashed line style
+        box->Draw("same");
+
+        // Store box in vector for memory management
+        systBoxes3.push_back(box);
+    }
 
     g1->Draw("P SAME");
 
@@ -695,24 +831,30 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::
     line_g2->SetLineStyle(2);    // Set line style: 1=solid, 2=dashed, etc. (optional)
     line_g2->Draw("SAME");
 
-    /*TLine *line_g3 = new TLine(0.5, g3->GetPointY(5), 6.5, g3->GetPointY(5));
+    TLine *line_g3 = new TLine(0.5, g3->GetPointY(5), 6.5, g3->GetPointY(5));
     line_g3->SetLineColor(kBlue); // Set line color (optional)
     line_g3->SetLineWidth(2);     // Set line width (optional)
     line_g3->SetLineStyle(2);     // Set line style: 1=solid, 2=dashed, etc. (optional)
-    line_g3->Draw("SAME");*/
+    line_g3->Draw("SAME");
 
-    TLegend *legend = new TLegend(0.55, 0.7, 0.9, 0.9);
+    TLegend *legend = new TLegend(0.55, 0.7, 0.95, 0.9);
     if (isdM)
     {
         legend->AddEntry(g1, "Template shift", "lp");
+        legend->AddEntry(line_g1, "Template pp", "l");
         legend->AddEntry(g2, "Fit mean", "lp");
-        // legend->AddEntry(g3, "Window Counting mean", "lp");
+        legend->AddEntry(line_g2, "Fit pp", "l");
+        legend->AddEntry(g3, "Window Counting mean", "lp");
+        legend->AddEntry(line_g3, "Window Counting pp", "l");
     }
     if (!isdM)
     {
         legend->AddEntry(g1, "Template shift", "lp");
+        legend->AddEntry(line_g1, "Template pp", "l");
         legend->AddEntry(g2, "Fit sigma", "lp");
-        // legend->AddEntry(g3, "Window Counting RMS", "lp");
+        legend->AddEntry(line_g2, "Fit pp", "l");
+        legend->AddEntry(g3, "Window Counting RMS", "lp");
+        legend->AddEntry(line_g3, "Window Counting pp", "l");
     }
     legend->SetBorderSize(0);
     legend->SetTextSize(0.03);
@@ -747,7 +889,7 @@ void drawHIppplot(TCanvas *c1 = nullptr, TGraphErrors *g1 = nullptr, const std::
 }
 
 void computeSystematicUncertainty(TGraphErrors *nominal, TGraphErrors *g1, TGraphErrors *g2, TGraphErrors *g3,
-                                  TGraphErrors *g4, TGraphErrors *g5, TGraphErrors *g6,
+                                  TGraphErrors *g4, TGraphErrors *g5, TGraphErrors *g6, TGraphErrors *g7, TGraphErrors *g8,
                                   std::vector<double> &systematicErrors)
 {
     int n = nominal->GetN();
@@ -772,6 +914,8 @@ void computeSystematicUncertainty(TGraphErrors *nominal, TGraphErrors *g1, TGrap
         double y_no_bkvalue;
         double y_uniformvalue;
         double y_mass_rangevalue;
+        double y_HF_up;
+        double y_HF_down;
 
         double x_nominalvalue;
         double x_tnpUvalue;
@@ -780,6 +924,8 @@ void computeSystematicUncertainty(TGraphErrors *nominal, TGraphErrors *g1, TGrap
         double x_no_bkvalue;
         double x_uniformvalue;
         double x_mass_rangevalue;
+        double x_HF_up;
+        double x_HF_down;
 
         nominal->GetPoint(i, x_nominalvalue, y_nominalvalue);
         g1->GetPoint(i, x_tnpUvalue, y_tnpUvalue);
@@ -788,6 +934,8 @@ void computeSystematicUncertainty(TGraphErrors *nominal, TGraphErrors *g1, TGrap
         g4->GetPoint(i, x_no_bkvalue, y_no_bkvalue);
         g5->GetPoint(i, x_uniformvalue, y_uniformvalue);
         g6->GetPoint(i, x_mass_rangevalue, y_mass_rangevalue);
+        g7->GetPoint(i, x_HF_up, y_HF_up);
+        g8->GetPoint(i, x_HF_down, y_HF_down);
 
         double tnpU_syst = abs(y_tnpUvalue - y_nominalvalue);
         double tnpD_syst = abs(y_tnpDvalue - y_nominalvalue);
@@ -795,8 +943,21 @@ void computeSystematicUncertainty(TGraphErrors *nominal, TGraphErrors *g1, TGrap
         double no_bk_syst = abs(y_no_bkvalue - y_nominalvalue);
         double uniform_syst = abs(y_uniformvalue - y_nominalvalue);
         double mass_range_syst = abs(y_mass_rangevalue - y_nominalvalue);
+        double HF_up_syst = abs(y_HF_up - y_nominalvalue);
+        double HF_down_syst = abs(y_HF_down - y_nominalvalue);
 
-        double totalsyst = tnpU_syst * tnpU_syst + tnpD_syst * tnpD_syst + acooff_syst * acooff_syst + no_bk_syst * no_bk_syst + mass_range_syst * mass_range_syst;
+        double finalHFsyst;
+
+        if (HF_up_syst > HF_down_syst)
+        {
+            finalHFsyst = HF_up_syst;
+        }
+        else
+        {
+            finalHFsyst = HF_down_syst;
+        }
+
+        double totalsyst = tnpU_syst * tnpU_syst + tnpD_syst * tnpD_syst + acooff_syst * acooff_syst + no_bk_syst * no_bk_syst + mass_range_syst * mass_range_syst + finalHFsyst * finalHFsyst;
         totalsyst = sqrt(totalsyst);
 
         systematicErrors.push_back(totalsyst);
@@ -845,7 +1006,62 @@ void computeSystematicUncertaintyfrank(TGraphErrors *nominal, TGraphErrors *g1, 
         systematicErrors.push_back(totalsyst);
     }
 }
-void mergeplot(bool iseta = 0)
+void computeSystematicUncertaintyfrankWindow(TGraphErrors *nominal, TGraphErrors *g1, TGraphErrors *g2,
+                                             std::vector<double> &systematicErrors)
+{
+    if (nominal == nullptr)
+    {
+        cout << "Missing hist for windowcounting systematic calculation!!" << endl;
+        return;
+    }
+    int n = nominal->GetN();
+    if (n != g1->GetN())
+    {
+        std::cerr << "Error: Nominal and variation graphs must have the same number of points!" << std::endl;
+        return;
+    }
+
+    std::vector<double> xValues(n);
+    std::vector<double> yValues(n);
+    std::vector<double> yStatErrors(n);
+    std::vector<double> ySystErrors(n);
+
+    // Loop over points
+    for (int i = 0; i < n; ++i)
+    {
+        double y_nominalvalue;
+        double y_3gamma;
+        double y_5gamma;
+
+        double x_nominalvalue;
+        double x_3gamma;
+        double x_5gamma;
+
+        nominal->GetPoint(i, x_nominalvalue, y_nominalvalue);
+        g1->GetPoint(i, x_3gamma, y_3gamma);
+        g2->GetPoint(i, x_5gamma, y_5gamma);
+
+        double val_3_gamma_syst = abs(y_3gamma - y_nominalvalue);
+        double val_5_gamma_syst = abs(y_5gamma - y_nominalvalue);
+
+        double totalsyst = 0;
+
+        if (val_3_gamma_syst > val_5_gamma_syst)
+        {
+            totalsyst = val_3_gamma_syst;
+        }
+        else
+        {
+            totalsyst = val_5_gamma_syst;
+        }
+
+        /*double totalsyst = changesig_syst * changesig_syst + linear_syst * linear_syst + CB_syst * CB_syst;
+        totalsyst = sqrt(totalsyst);*/
+
+        systematicErrors.push_back(totalsyst);
+    }
+}
+void mergeplot(bool iseta = 1)
 {
     // one is pp + HI Points, without subtracting.
     // one is HI Points, with pp subtracted.
@@ -858,6 +1074,11 @@ void mergeplot(bool iseta = 0)
     TFile *fit_changesig;
     TFile *fit_linear;
     TFile *fit_CB;
+    TFile *rms_nominal;
+    TFile *rms_FA_syst;
+
+    rms_nominal = new TFile("./RMS/ppPbPbCentMeanRMS_bkgd_subtracted_test.root", "READ");
+    rms_FA_syst = new TFile("./RMS/SystematicsRMSWindowGraphs.root", "READ");
 
     if (iseta)
     {
@@ -879,12 +1100,13 @@ void mergeplot(bool iseta = 0)
     readfrankplot(fit_linear, 3);
     readfrankplot(fit_CB, 4);
 
+    readfrankplotrms(rms_nominal, rms_FA_syst, iseta);
+
     // Zheng's Place :(
 
     TFile *f_2 = new TFile("./Zheng'stemplate/nominal_syst_tgraph.root", "READ");
     readplot(f_2, iseta);
 
-    // getppfit();
     // move 0-100 to second last position
     changeorderand(g_zh_HI_dM_nominal);
     changeorderand(g_zh_HI_dM_tnpU);
@@ -893,6 +1115,8 @@ void mergeplot(bool iseta = 0)
     changeorderand(g_zh_HI_dM_nominal_no_bk);
     changeorderand(g_zh_HI_dM_nominal_uniform_rebin);
     changeorderand(g_zh_HI_dM_nominal_mass_range);
+    changeorderand(g_zh_HI_dM_HF_up);
+    changeorderand(g_zh_HI_dM_HF_down);
 
     changeorderand(g_zh_HI_dW_nominal);
     changeorderand(g_zh_HI_dW_tnpU);
@@ -901,8 +1125,8 @@ void mergeplot(bool iseta = 0)
     changeorderand(g_zh_HI_dW_nominal_no_bk);
     changeorderand(g_zh_HI_dW_nominal_uniform_rebin);
     changeorderand(g_zh_HI_dW_nominal_mass_range);
-
-    cout << "TEST" << endl;
+    changeorderand(g_zh_HI_dW_HF_up);
+    changeorderand(g_zh_HI_dW_HF_down);
 
     changeorderfrank(g_frank_fit_dM_nominal, +1);
     changeorderfrank(g_frank_fit_dM_changesig, +1);
@@ -914,7 +1138,8 @@ void mergeplot(bool iseta = 0)
     changeorderfrank(g_frank_fit_dW_linearbackground, +1);
     changeorderfrank(g_frank_fit_dW_CB, +1);
 
-    cout << "TEST1" << endl;
+    /*changeorderfrank(g_frank_rms_dM_nominal, +1);
+    changeorderfrank(g_frank_rms_dW_nominal, +1);*/
 
     double frank_fit_pp_dM_nominal = h_frank_fit_pp_dM_nominal->GetBinContent(1);
     double frank_fit_pp_dM_changesig = h_frank_fit_pp_dM_changesig->GetBinContent(1);
@@ -936,7 +1161,10 @@ void mergeplot(bool iseta = 0)
     double frank_fit_pp_dW_linearbackground_err = h_frank_fit_pp_dW_linearbackground->GetBinError(1);
     double frank_fit_pp_dW_CB_err = h_frank_fit_pp_dW_CB->GetBinError(1);
 
-    cout << "TEST2" << endl;
+    double frank_window_pp_dM_nominal = g_frank_rms_pp_dM_nominal->GetBinContent(1);
+    double frank_window_pp_dM_nominal_err = g_frank_rms_pp_dM_nominal->GetBinError(1);
+    double frank_window_pp_dW_nominal = g_frank_rms_pp_dW_nominal->GetBinContent(1);
+    double frank_window_pp_dW_nominal_err = g_frank_rms_pp_dW_nominal->GetBinError(1);
 
     g_frank_fit_dM_nominal = addpppoint(g_frank_fit_dM_nominal, frank_fit_pp_dM_nominal, frank_fit_pp_dM_nominal_err);
     g_frank_fit_dM_changesig = addpppoint(g_frank_fit_dM_changesig, frank_fit_pp_dM_changesig, frank_fit_pp_dM_changesig_err);
@@ -958,7 +1186,19 @@ void mergeplot(bool iseta = 0)
     g_frank_fit_dW_linearbackground_minuspp = subtractppfromHI(g_frank_fit_dW_linearbackground);
     g_frank_fit_dW_CB_minuspp = subtractppfromHI(g_frank_fit_dW_CB);
 
-    cout << "TEST3" << endl;
+    g_frank_rms_dM_nominal = addpppoint(g_frank_rms_dM_nominal, frank_window_pp_dM_nominal, frank_window_pp_dM_nominal_err);
+    g_frank_rms_dW_nominal = addpppoint(g_frank_rms_dW_nominal, frank_window_pp_dW_nominal, frank_window_pp_dW_nominal_err);
+
+    g_frank_rms_dM_nominal_minuspp = subtractppfromHI(g_frank_rms_dM_nominal);
+    g_frank_rms_dW_nominal_minuspp = subtractppfromHI(g_frank_rms_dW_nominal);
+
+    g_frank_rms_pesudo_dM_3gamma_minuspp = subtractppfromHI(g_frank_rms_pesudo_dM_3gamma);
+    g_frank_rms_pesudo_dM_4gamma_minuspp = subtractppfromHI(g_frank_rms_pesudo_dM_4gamma);
+    g_frank_rms_pesudo_dM_5gamma_minuspp = subtractppfromHI(g_frank_rms_pesudo_dM_5gamma);
+
+    g_frank_rms_pesudo_dW_3gamma_minuspp = subtractppfromHI(g_frank_rms_pesudo_dW_3gamma);
+    g_frank_rms_pesudo_dW_4gamma_minuspp = subtractppfromHI(g_frank_rms_pesudo_dW_4gamma);
+    g_frank_rms_pesudo_dW_5gamma_minuspp = subtractppfromHI(g_frank_rms_pesudo_dW_5gamma);
 
     // move 0-100 to last position
     changeordersub(g_zh_HI_dM_nominal_minuspp);
@@ -968,6 +1208,8 @@ void mergeplot(bool iseta = 0)
     changeordersub(g_zh_HI_dM_nominal_no_bk_minuspp);
     changeordersub(g_zh_HI_dM_nominal_uniform_rebin_minuspp);
     changeordersub(g_zh_HI_dM_nominal_mass_range_minuspp);
+    changeordersub(g_zh_HI_dM_HF_down_minuspp);
+    changeordersub(g_zh_HI_dM_HF_up_minuspp);
 
     changeordersub(g_zh_HI_dW_nominal_minuspp);
     changeordersub(g_zh_HI_dW_tnpU_minuspp);
@@ -976,6 +1218,8 @@ void mergeplot(bool iseta = 0)
     changeordersub(g_zh_HI_dW_nominal_no_bk_minuspp);
     changeordersub(g_zh_HI_dW_nominal_uniform_rebin_minuspp);
     changeordersub(g_zh_HI_dW_nominal_mass_range_minuspp);
+    changeordersub(g_zh_HI_dW_HF_up_minuspp);
+    changeordersub(g_zh_HI_dW_HF_down_minuspp);
 
     vector<double> HI_pp_dM_syst;
     vector<double> HI_pp_dW_syst;
@@ -983,23 +1227,36 @@ void mergeplot(bool iseta = 0)
     vector<double> HI_sub_pp_dW_syst;
 
     computeSystematicUncertainty(g_zh_HI_dM_nominal, g_zh_HI_dM_tnpU, g_zh_HI_dM_tnpD, g_zh_HI_dM_acooff, g_zh_HI_dM_nominal_no_bk,
-                                 g_zh_HI_dM_nominal_uniform_rebin, g_zh_HI_dM_nominal_mass_range, HI_pp_dM_syst);
+                                 g_zh_HI_dM_nominal_uniform_rebin, g_zh_HI_dM_nominal_mass_range, g_zh_HI_dM_HF_up, g_zh_HI_dM_HF_down, HI_pp_dM_syst);
     computeSystematicUncertainty(g_zh_HI_dW_nominal, g_zh_HI_dW_tnpU, g_zh_HI_dW_tnpD, g_zh_HI_dW_acooff, g_zh_HI_dW_nominal_no_bk,
-                                 g_zh_HI_dW_nominal_uniform_rebin, g_zh_HI_dW_nominal_mass_range, HI_pp_dW_syst);
+                                 g_zh_HI_dW_nominal_uniform_rebin, g_zh_HI_dW_nominal_mass_range, g_zh_HI_dW_HF_up, g_zh_HI_dW_HF_down, HI_pp_dW_syst);
     computeSystematicUncertainty(g_zh_HI_dM_nominal_minuspp, g_zh_HI_dM_tnpU_minuspp, g_zh_HI_dM_tnpD_minuspp, g_zh_HI_dM_acooff_minuspp, g_zh_HI_dM_nominal_no_bk_minuspp,
-                                 g_zh_HI_dM_nominal_uniform_rebin_minuspp, g_zh_HI_dM_nominal_mass_range_minuspp, HI_sub_pp_dM_syst);
+                                 g_zh_HI_dM_nominal_uniform_rebin_minuspp, g_zh_HI_dM_nominal_mass_range_minuspp, g_zh_HI_dM_HF_up_minuspp, g_zh_HI_dM_HF_down_minuspp, HI_sub_pp_dM_syst);
     computeSystematicUncertainty(g_zh_HI_dW_nominal_minuspp, g_zh_HI_dW_tnpU_minuspp, g_zh_HI_dW_tnpD_minuspp, g_zh_HI_dW_acooff_minuspp, g_zh_HI_dW_nominal_no_bk_minuspp,
-                                 g_zh_HI_dW_nominal_uniform_rebin_minuspp, g_zh_HI_dW_nominal_mass_range_minuspp, HI_sub_pp_dW_syst);
+                                 g_zh_HI_dW_nominal_uniform_rebin_minuspp, g_zh_HI_dW_nominal_mass_range_minuspp, g_zh_HI_dW_HF_up_minuspp, g_zh_HI_dW_HF_down_minuspp, HI_sub_pp_dW_syst);
 
     vector<double> HI_pp_dM_syst_fit;
     vector<double> HI_pp_dW_syst_fit;
     vector<double> HI_sub_pp_dM_syst_fit;
     vector<double> HI_sub_pp_dW_syst_fit;
+    cout << "TEST" << endl;
 
     computeSystematicUncertaintyfrank(g_frank_fit_dM_nominal, g_frank_fit_dM_changesig, g_frank_fit_dM_linearbackground, g_frank_fit_dM_CB, HI_pp_dM_syst_fit);
     computeSystematicUncertaintyfrank(g_frank_fit_dW_nominal, g_frank_fit_dW_changesig, g_frank_fit_dW_linearbackground, g_frank_fit_dW_CB, HI_pp_dW_syst_fit);
     computeSystematicUncertaintyfrank(g_frank_fit_dM_nominal_minuspp, g_frank_fit_dM_changesig_minuspp, g_frank_fit_dM_linearbackground_minuspp, g_frank_fit_dM_CB_minuspp, HI_sub_pp_dM_syst_fit);
     computeSystematicUncertaintyfrank(g_frank_fit_dW_nominal_minuspp, g_frank_fit_dW_changesig_minuspp, g_frank_fit_dW_linearbackground_minuspp, g_frank_fit_dW_CB_minuspp, HI_sub_pp_dW_syst_fit);
+    cout << "TEST1" << endl;
+
+    vector<double> HI_pp_dM_syst_window;
+    vector<double> HI_pp_dW_syst_window;
+    vector<double> HI_sub_pp_dM_syst_window;
+    vector<double> HI_sub_pp_dW_syst_window;
+
+    computeSystematicUncertaintyfrankWindow(g_frank_rms_pesudo_dM_4gamma, g_frank_rms_pesudo_dM_3gamma, g_frank_rms_pesudo_dM_5gamma, HI_pp_dM_syst_window);
+    computeSystematicUncertaintyfrankWindow(g_frank_rms_pesudo_dW_4gamma, g_frank_rms_pesudo_dW_3gamma, g_frank_rms_pesudo_dW_5gamma, HI_pp_dW_syst_window);
+    computeSystematicUncertaintyfrankWindow(g_frank_rms_pesudo_dM_4gamma_minuspp, g_frank_rms_pesudo_dM_3gamma_minuspp, g_frank_rms_pesudo_dM_5gamma_minuspp, HI_sub_pp_dM_syst_window);
+    computeSystematicUncertaintyfrankWindow(g_frank_rms_pesudo_dW_4gamma_minuspp, g_frank_rms_pesudo_dW_3gamma_minuspp, g_frank_rms_pesudo_dW_5gamma_minuspp, HI_sub_pp_dW_syst_window);
+    cout << "TEST2" << endl;
 
     subtractconstantfromHI(g_zh_HI_dM_nominal, -91.1876, 0);
     subtractconstantfromHI(g_zh_HI_dW_nominal, -2.4955, 0);
@@ -1007,10 +1264,14 @@ void mergeplot(bool iseta = 0)
     changeorderfrank(g_zh_HI_dM_nominal_minuspp, -0.1);
     changeorderfrank(g_zh_HI_dW_nominal_minuspp, -0.1);
 
+    changeorderfrank(g_frank_rms_dM_nominal_minuspp, +0.1);
+    changeorderfrank(g_frank_rms_dW_nominal_minuspp, +0.1);
+    cout << "TEST3" << endl;
+
     TCanvas *c1 = new TCanvas("c1", "", 800, 800);
-    drawsubtractionplot(c1, g_zh_HI_dM_nominal_minuspp, HI_sub_pp_dM_syst, g_frank_fit_dM_nominal_minuspp, HI_sub_pp_dM_syst_fit, nullptr, iseta, true);
-    drawsubtractionplot(c1, g_zh_HI_dW_nominal_minuspp, HI_sub_pp_dW_syst, g_frank_fit_dW_nominal_minuspp, HI_sub_pp_dW_syst_fit, nullptr, iseta, false);
+    drawsubtractionplot(c1, g_zh_HI_dM_nominal_minuspp, HI_sub_pp_dM_syst, g_frank_fit_dM_nominal_minuspp, HI_sub_pp_dM_syst_fit, g_frank_rms_dM_nominal_minuspp, HI_sub_pp_dM_syst_window, iseta, true);
+    drawsubtractionplot(c1, g_zh_HI_dW_nominal_minuspp, HI_sub_pp_dW_syst, g_frank_fit_dW_nominal_minuspp, HI_sub_pp_dW_syst_fit, g_frank_rms_dW_nominal_minuspp, HI_sub_pp_dW_syst_window, iseta, false);
     TCanvas *c2 = new TCanvas("c2", "", 800, 800);
-    drawHIppplot(c1, g_zh_HI_dM_nominal, HI_pp_dM_syst, g_frank_fit_dM_nominal, HI_pp_dM_syst_fit, nullptr, iseta, true);
-    drawHIppplot(c1, g_zh_HI_dW_nominal, HI_pp_dW_syst, g_frank_fit_dW_nominal, HI_pp_dW_syst_fit, nullptr, iseta, false);
+    drawHIppplot(c1, g_zh_HI_dM_nominal, HI_pp_dM_syst, g_frank_fit_dM_nominal, HI_pp_dM_syst_fit, g_frank_rms_dM_nominal, HI_pp_dM_syst_window, iseta, true);
+    drawHIppplot(c1, g_zh_HI_dW_nominal, HI_pp_dW_syst, g_frank_fit_dW_nominal, HI_pp_dW_syst_fit, g_frank_rms_dW_nominal, HI_pp_dW_syst_window, iseta, false);
 }
